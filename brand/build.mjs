@@ -187,27 +187,17 @@ function bannerSvg(mode, { transparent = false } = {}) {
   const W = 2400, Hh = 640
   const bg = mode === 'dark' ? DARK : WHITE
   const fg = GREY[mode][0]
-  const muted = mode === 'dark' ? MUTED_DARK : MUTED
   const M = 384
   const mx = 176, my = (Hh - M) / 2
   const nameSize = 250
   const tx = mx + M + 96
-  // The tagline doesn't fit beside the mark on one line, so it wraps onto two,
-  // split at the space nearest its middle.
-  const words = TAGLINE.split(' ')
-  let cut = 1
-  for (let i = 1; i < words.length; i++) {
-    const a = words.slice(0, i).join(' ').length, b = words.slice(i).join(' ').length
-    const ca = words.slice(0, cut).join(' ').length, cb = words.slice(cut).join(' ').length
-    if (Math.abs(a - b) < Math.abs(ca - cb)) cut = i
-  }
-  const lines = [words.slice(0, cut).join(' '), words.slice(cut).join(' ')]
-  const name = wordmark(nameSize, { x: tx, y: my + 196 })
-  const tag = { d: lines.map((l, i) => textPath(TEXT, l, 64, { x: tx + 6, y: my + 300 + i * 82 }).d).join('') }
+  // No tagline on the banner: the README writes its text beside the image,
+  // so the banner carries only the mark and the name, centred on the mark.
+  const name = wordmark(nameSize, { x: tx, y: my + M / 2 + 65 })
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${Hh}" viewBox="0 0 ${W} ${Hh}">`
     + (transparent ? '' : `<rect width="${W}" height="${Hh}" fill="${bg}"/>`)
     + markPaths(M, mode, { dx: mx, dy: my })
-    + `<path d="${name.d}" fill="${fg}"/><path d="${tag.d}" fill="${muted}"/></svg>\n`
+    + `<path d="${name.d}" fill="${fg}"/></svg>\n`
 }
 
 // ─── Share card, 2400 × 1200 ────────────────────────────────────────────────

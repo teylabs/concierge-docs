@@ -120,8 +120,9 @@ so it stays visible in print and on projectors. The name stays legible at the
 in `build.mjs` and rebuild.
 
 The tagline is “A standard suite of essentials for every Laravel app you
-build.” It's `TAGLINE` in `build.mjs`: one line on the share card, wrapped onto
-two beside the mark on the banners. Change it there and rebuild.
+build.” It's `TAGLINE` in `build.mjs`, used on the share card only. The banners carry
+just the mark and the name: a README writes its own text beside the image,
+never baked into it. Change the tagline there and rebuild.
 
 ## Deployed copies
 
