@@ -92,12 +92,14 @@ Reads an invitation's state for your acceptance page. It writes nothing, and `Ac
 AcceptInvitation::run(Member $user, string $token): Acceptance
 ```
 
-Makes `$user` an active member of the invitation's workspace with the invitation's roles. A removed member who accepts a new invitation becomes active again.
+Makes `$user` an active member of the invitation's workspace with the invitation's roles. A removed member who accepts a new invitation becomes active again. In app-wide mode it grants the roles to the whole app instead, and records the invitation on the user's account row.
 
 - **Who may call it:** the signed-in invitee. Their email must match the invitation, and be verified.
-- **Returns:** `Acceptance`, with `$membership` and `$outcome`: `AcceptanceOutcome::Joined`, or `AcceptanceOutcome::AlreadyMember` when the user was already an active member (their roles are not changed) or already accepted this invitation.
+- **Returns:** `Acceptance`, with `$membership` (`null` in app-wide mode, where `$account` holds the account row) and `$outcome`: `AcceptanceOutcome::Joined`, or `AcceptanceOutcome::AlreadyMember` when the user was already an active member (their roles are not changed) or already accepted this invitation.
 - **Throws:** `InvitationRejected`, whose `$state` is the [`InvitationState`](#invitation-states) that stopped it.
 - **Dispatches:** `InvitationAccepted`, except when the same user accepts the same invitation again.
+
+`ResendInvitation` and `RevokeInvitation` are for workspace invitations only for now ([#79](https://github.com/teylabs/concierge/issues/79)).
 
 ### ChangeMemberRoles
 
@@ -187,6 +189,105 @@ Creates each role in `roles` that does not exist yet, as a global Spatie role on
 
 - **Who may call it:** your own code, or the console as `php artisan concierge:sync-roles` (registered while membership is on).
 - **Throws:** `UnsupportedConfiguration` when `permission.teams` is not `true`.
+
+## App-Wide Actions
+
+These need `'mode' => 'app'`; see [App-Wide Mode](/features/app-wide-mode). In workspace mode each throws `UnsupportedConfiguration` naming the workspace action to use. They check the [account policy](#account-policy) rather than the grant policy, and each runs in one database transaction that locks the account rows of every owner, the actor and the user.
+
+### EstablishOwner
+
+```php
+EstablishOwner::run(Member $user): Account
+```
+
+Makes `$user` an active owner of the app: their roles are replaced with the `owner_role`, and their account row is created or made active.
+
+- **Who may call it:** your own code. It takes no actor and checks no permission.
+- **Returns:** the user's `Tey\Concierge\Models\Account`. Calling it again for an owner changes nothing. Several owners are allowed.
+- **Throws:** `UnsupportedConfiguration` in workspace mode, or when `permission.teams` is `true`.
+- **Dispatches:** `OwnerEstablished`, unless the user was already an owner.
+
+### InviteUser
+
+```php
+InviteUser::run(Member $actor, string $email, GrantSet $grants): IssuedInvitation
+```
+
+Creates a pending app-wide invitation for `$email` (trimmed and lowercased) with the roles in `$grants`, and queues its email when [delivery](/reference/configuration#invitations) is set up. Accept it with [`AcceptInvitation`](#acceptinvitation).
+
+- **Who may call it:** an active manager who may grant every role in `$grants`.
+- **Returns:** `IssuedInvitation`, with `$invitation` and the one-time `$token`.
+- **Throws:** `AuthorizationException` from the account policy. `ValidationException` when the email is invalid, a user with that email already exists ("change their roles instead", or "restore it instead" when deactivated), an unexpired invitation is already pending for it, or a role does not exist. An expired pending invitation for the same email is marked expired and replaced.
+- **Dispatches:** `UserInvited`.
+
+### ChangeUserRoles
+
+```php
+ChangeUserRoles::run(Member $actor, Member $user, GrantSet $grants): Account
+```
+
+Replaces the user's app-wide roles with the roles in `$grants`. Granting the owner role is how ownership passes on.
+
+- **Who may call it:** an active manager who outranks the user and may grant every role in `$grants`. An owner may manage another owner, and grant or take away the owner role. Not on themselves, and never leaving no owner.
+- **Returns:** the user's `Account`.
+- **Throws:** `AuthorizationException` from the account policy.
+- **Dispatches:** `UserRolesChanged`.
+
+### RemoveUser
+
+```php
+RemoveUser::run(Member $actor, Member $user): Member
+```
+
+Clears the user's roles and direct permissions, deletes their account row, then calls `delete()` on the user model. A model with `SoftDeletes` is soft deleted. Content the user wrote and your other tables are yours to handle; listen to `UserRemoved`.
+
+- **Who may call it:** the same as `ChangeUserRoles`, without the grant check.
+- **Returns:** the user model.
+- **Throws:** `AuthorizationException` from the account policy. `UnsupportedConfiguration` when the user model is not an Eloquent model.
+- **Dispatches:** `UserRemoved`.
+
+### UpdateUser
+
+```php
+UpdateUser::run(Member $actor, Member $user, ?string $name = null, ?string $email = null): Member
+```
+
+Writes another user's `name` and `email` attributes. A `null` argument leaves that field alone. See [Editing a User](/features/users#editing-a-user).
+
+- **Who may call it:** the same as `RemoveUser`.
+- **Returns:** the user model. Nothing is written when neither field changes.
+- **Throws:** `AuthorizationException` from the account policy. `ValidationException` keyed `name` when the name is empty or longer than 255 characters, or `email` when the email is invalid, longer than 255 characters or used by another user (ignoring case). `UnsupportedConfiguration` when the user model is not an Eloquent model.
+- **Dispatches:** `UserUpdated`, when a field changed.
+
+## Account Actions
+
+These work in both modes; see [Deactivating and Restoring](/features/users#deactivating-and-restoring). They check the [account policy](#account-policy). In workspace mode, bind your own policy to say who may call them.
+
+### DeactivateUser
+
+```php
+DeactivateUser::run(Member $actor, Member $user, ?string $reason = null): Account
+```
+
+Marks the user's account row deactivated, replaces their remember-me token and, with the `database` session driver, deletes their sessions. Roles, memberships and API tokens are kept. `$reason` is trimmed and cut to 500 characters.
+
+- **Who may call it:** the same as `RemoveUser`: not themselves, not the last owner, not someone of equal or higher rank.
+- **Returns:** the user's `Account`.
+- **Throws:** `AuthorizationException` from the account policy, or with code `already_deactivated`. `UnsupportedConfiguration` when the user model is not `Authenticatable`.
+- **Dispatches:** `UserDeactivated`.
+
+### RestoreUser
+
+```php
+RestoreUser::run(Member $actor, Member $user): Account
+```
+
+Makes a deactivated account active again, with the roles it had. No invitation is sent.
+
+- **Who may call it:** the same as `DeactivateUser`.
+- **Returns:** the user's `Account`.
+- **Throws:** `AuthorizationException` from the account policy, or with code `not_deactivated`.
+- **Dispatches:** `UserRestored`.
 
 ## Tenant Invitation Actions
 
@@ -284,9 +385,24 @@ The membership actions that manage other members ask the grant policy, `Tey\Conc
 
 Bind your own class to `Tey\Concierge\Contracts\GrantPolicy` in a service provider to change these rules. The tenant invitation actions check the `tenant_invitations.ability` Gate ability instead; see [Authorization](/features/tenant-invitations#authorization).
 
+### Account Policy
+
+The app-wide and account actions ask `Tey\Concierge\Contracts\AccountPolicy` instead. The default, `Tey\Concierge\Support\ConfiguredAccountPolicy`, reads the same configuration with the app-wide [ownership rules](/features/app-wide-mode#who-may-manage-whom), and denies with these codes:
+
+| Code | When |
+| --- | --- |
+| `not_member` | The actor's account is deactivated |
+| `not_manager` | The actor holds none of the `managers` roles |
+| `self` | The actor is acting on their own account |
+| `rank` | The user's highest role is equal to or above the actor's, and they are not both owners |
+| `last_owner` | No other active owner would remain |
+| `not_grantable` | A role is not grantable by any role the actor holds |
+
+Bind your own class to `AccountPolicy` in a service provider to change these rules.
+
 ### Account Guard
 
-`Tey\Concierge\Contracts\AccountGuard` is a veto your app can place on operations on particular accounts, checked after the grant policy passes. `ForcePasswordReset` asks it with the operation `AccountGuard::FORCE_PASSWORD_RESET`:
+`Tey\Concierge\Contracts\AccountGuard` is a veto your app can place on operations on particular accounts. `ForcePasswordReset` asks it with the operation `AccountGuard::FORCE_PASSWORD_RESET`, after the grant policy passes. The account policy asks it with `AccountGuard::MANAGE_ACCOUNT` before its rank rules, and an owner it shields is not counted as another owner for the last-owner rule:
 
 ```php
 public function authorize(string $operation, Member $actor, Member $target): Response;
@@ -315,6 +431,8 @@ The default, `Tey\Concierge\Support\OpenAccountGuard`, allows everything. Bind y
 | `AuthorityLapsed` | The inviter may no longer grant the invitation's roles | ✓ | |
 | `GrantsChanged` | A role was recreated or gained permissions since the invitation was sent | ✓ | |
 
+App-wide invitations use the workspace column. For them, `Suspended` means the signed-in user's account is deactivated, and `WorkspaceUnavailable` does not apply.
+
 `RegisterRequired` and `SignInRequired` are returned only to a guest. `AlreadyMember` for an active member is not a rejection: `AcceptInvitation` consumes the invitation and returns `AcceptanceOutcome::AlreadyMember`.
 
 ## Events
@@ -327,13 +445,20 @@ Every event is in `Tey\Concierge\Events`, is dispatched only after the transacti
 | `MemberInvited` | `InviteMember` creates an invitation | `int $workspaceId`, `int $invitationId`, `?int $actorId` |
 | `InvitationResent` | `ResendInvitation` rotates a token | `int $workspaceId`, `int $invitationId`, `int $generation`, `?int $actorId` |
 | `InvitationRevoked` | `RevokeInvitation` revokes an invitation | `int $workspaceId`, `int $invitationId`, `?int $actorId` |
-| `InvitationAccepted` | `AcceptInvitation` consumes an invitation | `int $workspaceId`, `int $invitationId`, `int $membershipId`, `int $userId`, `string $outcome` (`joined` or `already_member`) |
+| `InvitationAccepted` | `AcceptInvitation` consumes an invitation | `?int $workspaceId`, `int $invitationId`, `?int $membershipId` (both `null` for an app-wide invitation), `int $userId`, `string $outcome` (`joined` or `already_member`) |
 | `MemberRolesChanged` | `ChangeMemberRoles` replaces a member's roles | `int $workspaceId`, `int $membershipId`, `list<string> $roles` (the new roles), `?int $actorId` |
 | `MembershipSuspended` | `SuspendMembership` suspends a membership | `int $workspaceId`, `int $membershipId`, `?int $actorId` |
 | `MembershipReinstated` | `ReinstateMembership` reinstates a membership | `int $workspaceId`, `int $membershipId`, `?int $actorId` |
 | `MembershipRemoved` | `RemoveMembership` removes a membership | `int $workspaceId`, `int $membershipId`, `?int $actorId` |
 | `OwnershipTransferred` | `TransferOwnership` changes the owner | `int $workspaceId`, `int $fromMembershipId`, `int $toMembershipId`, `?int $actorId` |
 | `PasswordResetForced` | `ForcePasswordReset` locks an account down | `int $workspaceId`, `int $membershipId`, `int $userId`, `?int $actorId`, `bool $twoFactorReset`, `?int $sessionsEnded` |
+| `OwnerEstablished` | `EstablishOwner` makes a user an owner | `int $userId` |
+| `UserInvited` | `InviteUser` creates an app-wide invitation | `int $invitationId`, `?int $actorId` |
+| `UserRolesChanged` | `ChangeUserRoles` replaces a user's roles | `int $userId`, `list<string> $roles` (the new roles), `?int $actorId` |
+| `UserRemoved` | `RemoveUser` removes a user | `int $userId`, `?int $actorId` |
+| `UserUpdated` | `UpdateUser` changes a name or email | `int $userId`, `?int $actorId`, `array $changes`: each changed field (`name` or `email`) with its `old` and `new` value |
+| `UserDeactivated` | `DeactivateUser` deactivates an account | `int $userId`, `?int $actorId`, `?string $reason`, `?int $sessionsEnded` (database session rows deleted, or `null` with any other session driver) |
+| `UserRestored` | `RestoreUser` restores an account | `int $userId`, `?int $actorId` |
 | `TenantInvited` | `InviteTenant` creates a tenant invitation | `int $invitationId`, `?int $actorId` |
 | `TenantInvitationResent` | `ResendTenantInvitation` rotates a token | `int $invitationId`, `int $generation`, `?int $actorId` |
 | `TenantInvitationRevoked` | `RevokeTenantInvitation` revokes a tenant invitation | `int $invitationId`, `?int $actorId` |

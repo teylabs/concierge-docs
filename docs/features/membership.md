@@ -2,6 +2,8 @@
 
 Membership gives an app invitations, memberships, ownership and role grants, each scoped to a workspace: the team or organization a user belongs to. It is on by default and builds on [spatie/laravel-permission](https://spatie.be/docs/laravel-permission) teams.
 
+This page covers workspace mode. An app with one organization can use [app-wide mode](/features/app-wide-mode) instead, and an app with a starter kit's teams can use [starter kit teams](/features/starter-kit-teams).
+
 ## Requirements
 
 - Spatie permission **teams enabled** (`permission.teams = true`). Concierge throws `UnsupportedConfiguration` otherwise.
@@ -14,10 +16,12 @@ The package registers its migration automatically, and that migration reads your
 
 1. Define your user and workspace models and their migrations, and implement the [contracts](#implementing-the-contracts).
 2. Publish the Spatie permission config and migrations, and set `permission.teams` to `true`.
-3. Publish `config/concierge.php` and set the two models:
+3. Publish `config/concierge.php`, and set workspace mode and the two models:
 
     ```php
     // config/concierge.php
+    'mode' => 'workspaces',
+
     'models' => [
         'user' => App\Models\User::class,
         'workspace' => App\Models\Workspace::class,

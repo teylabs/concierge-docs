@@ -21,7 +21,9 @@ Each feature is set in `config/concierge.php`.
 | [Forced password reset](/features/forced-password-reset) | A manager locks an account down and the person receives a reset link | With membership |
 | [Local login](/features/local-login) | One-click sign-in as a configured account, in the `local` environment only | Off |
 
-[Vue pages](/features/vue-pages) for membership and a local-login button are included as optional Vue 3 components, with [avatars](/features/avatars) for people without a photo. The PHP code never depends on them.
+[Vue pages](/features/vue-pages) for membership, users and a local-login button are included as optional Vue 3 components, with [avatars](/features/avatars) for people without a photo. The PHP code never depends on them.
+
+Three early, opt-in features arrived in 0.7, ahead of 0.8: [app-wide mode](/features/app-wide-mode) for an app with one organization, [starter kit teams](/features/starter-kit-teams), and the [Users](/features/users) pages with deactivation.
 
 Local login and registration work without membership, so an app can use either alone.
 

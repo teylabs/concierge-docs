@@ -48,24 +48,26 @@ php artisan concierge:install
 - [Initials avatars](/features/avatars) for people without a photo ([#48](https://github.com/teylabs/concierge/issues/48), done)
 - Plain action and data classes in place of laravel-actions and laravel-data ([#51](https://github.com/teylabs/concierge/issues/51), done)
 
-### 0.7: Built on Mod
+### 0.7: Built on Mod (Done)
 
-[Milestone 0.7](https://github.com/teylabs/concierge/milestone/2): concierge's routes, pages and providers run through [mod](https://mod.teylabs.com).
+[Milestone 0.7](https://github.com/teylabs/concierge/milestone/2), closed: concierge's routes, pages and providers run through [mod](https://mod.teylabs.com).
 
-- Routes, pages and providers run through mod's host API ([#17](https://github.com/teylabs/concierge/issues/17))
-- Require `tey/mod` ([#18](https://github.com/teylabs/concierge/issues/18))
-- `php artisan concierge:pages` writes concierge's pages into your app for you to own and edit ([#18](https://github.com/teylabs/concierge/issues/18))
+- Concierge declares its Inertia pages and frontend wiring to mod, so `php artisan mod:install inertia` sets up an app instead of hand-written aliases ([#17](https://github.com/teylabs/concierge/issues/17), done; see [Vue pages](/features/vue-pages))
+- Require `tey/mod` ([#18](https://github.com/teylabs/concierge/issues/18), done)
+- `php artisan concierge:pages` writes concierge's pages into your app for you to own and edit ([#18](https://github.com/teylabs/concierge/issues/18), done)
+
+It also brings early, opt-in pieces of 0.8: [app-wide mode](/features/app-wide-mode), [starter kit teams](/features/starter-kit-teams), and the [Users pages and deactivation](/features/users).
 
 ### 0.8: Meets Any App Where It's At
 
 [Milestone 0.8](https://github.com/teylabs/concierge/milestone/3): with or without workspaces, with or without existing sign-in, plus the user administration every app needs.
 
-- App-wide mode: invitations and roles without workspaces ([#19](https://github.com/teylabs/concierge/issues/19))
-- Use an app's existing team or organization model as the workspace, including a starter kit's own teams ([#20](https://github.com/teylabs/concierge/issues/20))
+- App-wide mode: invitations and roles without workspaces ([#19](https://github.com/teylabs/concierge/issues/19), started in 0.7)
+- Use an app's existing team or organization model as the workspace, including a starter kit's own teams ([#20](https://github.com/teylabs/concierge/issues/20), done in 0.7)
 - Upgrade an app from app-wide mode to workspaces ([#21](https://github.com/teylabs/concierge/issues/21))
 - Sign-in for apps that have no authentication ([#23](https://github.com/teylabs/concierge/issues/23))
-- App-wide user admin: list, edit, change role, remove ([#43](https://github.com/teylabs/concierge/issues/43))
-- Deactivate and restore users across the app ([#44](https://github.com/teylabs/concierge/issues/44))
+- App-wide user admin: list, edit, change role, remove ([#43](https://github.com/teylabs/concierge/issues/43), started in 0.7)
+- Deactivate and restore users across the app ([#44](https://github.com/teylabs/concierge/issues/44), done in 0.7)
 - Impersonation with a visible "stop impersonating" banner ([#46](https://github.com/teylabs/concierge/issues/46))
 - Admin-forced password reset in the user admin, building on the 0.6 action ([#47](https://github.com/teylabs/concierge/issues/47))
 - A protected operator account, kept in sync on every deploy ([#49](https://github.com/teylabs/concierge/issues/49))
