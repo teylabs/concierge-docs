@@ -35,4 +35,4 @@ Each feature page lists exactly what it expects from the app.
 
 ## What Comes Next
 
-The road to 1.0 is planned in public: setup in one command, app-wide user management, a portal and pages for every starter kit. See [What concierge covers](/roadmap).
+The road to 1.0 is planned in public: concierge as a starter kit extension, with setup in one command, app-wide user management, and pages scaffolded into each starter kit with its own components. See [What concierge covers](/roadmap).

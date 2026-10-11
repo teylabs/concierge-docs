@@ -7,14 +7,18 @@ Concierge is working toward 1.0 in public. This page is the plan: everything bel
 
 ## The End Goal
 
-Install a Laravel starter kit, then install concierge:
+Concierge is planned as a starter kit extension: it extends the Laravel starter kit an app started with, so the starter kit story carries on from sign-in to user management. Install a starter kit, then install concierge:
 
 ```bash
 composer require tey/concierge
 php artisan concierge:install
 ```
 
-`concierge:install` is planned for 0.8. When the plan is complete, the app has working user management on every official starter kit (Vue, React and Livewire), with a portal at its own URL and the same pages inside the app's own layout. Concierge builds on the starter kit's sign-in and takes it from there.
+`concierge:install` is planned for 0.8. When the plan is complete:
+
+- `concierge:install` detects the starter kit and scaffolds concierge's pages into the app, written with that kit's own components and layout: Vue, React or Livewire ([#57](https://github.com/teylabs/concierge/issues/57)). The app owns the pages; the logic stays in the package and updates with `composer update`.
+- The app's first owner signs in: one click in local development, created on deploy in production.
+- An app without a starter kit has an option too: concierge's packaged Vue components, a standalone portal at its own URL, or headless use with the app's own pages.
 
 [Issue #13](https://github.com/teylabs/concierge/issues/13) shows the same goal step by step: from a starter kit to working user management in two commands.
 
@@ -26,11 +30,11 @@ php artisan concierge:install
 
 - Local login fails closed outside the local environment, under every cache combination ([#9](https://github.com/teylabs/concierge/issues/9), done)
 - Published on Packagist ([#15](https://github.com/teylabs/concierge/issues/15), done)
+- The repository follows Tey Labs conventions: issue forms, Discussions, private vulnerability reporting ([#16](https://github.com/teylabs/concierge/issues/16), done)
 - A README rewritten for newcomers ([#10](https://github.com/teylabs/concierge/issues/10))
 - This documentation site ([#11](https://github.com/teylabs/concierge/issues/11))
 - A logo and wordmark ([#12](https://github.com/teylabs/concierge/issues/12))
 - Discoverability: llms.txt, Composer keywords, GitHub description and topics ([#14](https://github.com/teylabs/concierge/issues/14))
-- The repository follows Tey Labs conventions: issue forms, Discussions, private vulnerability reporting ([#16](https://github.com/teylabs/concierge/issues/16))
 
 ### 0.6: Built on Mod
 
@@ -42,7 +46,7 @@ php artisan concierge:install
 
 ### 0.7: Meets Any App Where It's At
 
-[Milestone 0.7](https://github.com/teylabs/concierge/milestone/3): with or without workspaces, with or without existing sign-in.
+[Milestone 0.7](https://github.com/teylabs/concierge/milestone/3): with or without workspaces, with or without existing sign-in, plus the user administration every app needs.
 
 - App-wide mode: invitations and roles without workspaces ([#19](https://github.com/teylabs/concierge/issues/19))
 - Use an app's existing team or organization model as the workspace ([#20](https://github.com/teylabs/concierge/issues/20))
@@ -71,13 +75,14 @@ php artisan concierge:install
 
 ### 0.9: Every Frontend
 
-[Milestone 0.9](https://github.com/teylabs/concierge/milestone/5): a standalone portal at its own URL, plus embedded pages for the Vue, React and Livewire starter kits.
+[Milestone 0.9](https://github.com/teylabs/concierge/milestone/5): native pages scaffolded into each starter kit, packaged components, a standalone portal, or headless use.
 
+- Scaffold native pages for each starter kit, with options for apps without one ([#57](https://github.com/teylabs/concierge/issues/57))
+- React starter kit pages, scaffolded with the kit's own components ([#40](https://github.com/teylabs/concierge/issues/40))
+- Livewire starter kit pages, scaffolded with the kit's own components ([#41](https://github.com/teylabs/concierge/issues/41))
 - A standalone portal served from a prebuilt bundle ([#32](https://github.com/teylabs/concierge/issues/32))
 - A portal header with "return to app", the app's name and logo ([#33](https://github.com/teylabs/concierge/issues/33))
 - A browser setup wizard, in the local environment only ([#34](https://github.com/teylabs/concierge/issues/34))
-- React starter kit integration ([#40](https://github.com/teylabs/concierge/issues/40))
-- Livewire starter kit integration ([#41](https://github.com/teylabs/concierge/issues/41))
 - Notification topics: choose who receives which alerts ([#50](https://github.com/teylabs/concierge/issues/50))
 - A README hero: from a starter kit to working user management in two commands ([#13](https://github.com/teylabs/concierge/issues/13))
 
