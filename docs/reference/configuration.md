@@ -1,0 +1,105 @@
+# Configuration
+
+Every key in `config/concierge.php`, with its type, default and what it does, grouped by feature.
+
+Publish the file to change any of them:
+
+```bash
+php artisan vendor:publish --tag="concierge-config"
+# -> config/concierge.php
+```
+
+No key reads an environment variable: set values in the file itself. Local login also checks `APP_ENV` directly; see [When It Is Available](/features/local-login#when-it-is-available).
+
+## Features
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `features.membership` | `bool` | `true` | Turns [membership](/features/membership) on. Only `false` turns it off. When off, Concierge registers no membership bindings, no `concierge.member` middleware alias and no `concierge:sync-roles` command, and does not run its migration. |
+| `features.tenant_invitations` | `bool` | `false` | Turns [tenant invitations](/features/tenant-invitations) on. Only `true` turns it on, and only while membership is on. When off, there is no tenant invitations migration, rate limiter or Gate definition. |
+
+Both switches are read while the package provider registers, so set them in `config/concierge.php`, not at runtime. Set `features.tenant_invitations` before publishing migrations.
+
+## Models
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `models.user` | `class-string` or `null` | `null` | Your user model. Required for membership. It must be an Eloquent model implementing `Tey\Concierge\Contracts\Member`, use Spatie's `HasRoles` and have an incrementing integer key. |
+| `models.workspace` | `class-string` or `null` | `null` | Your workspace model. Required for membership. It must be an Eloquent model implementing `Tey\Concierge\Contracts\Workspace`, with an incrementing integer key. |
+| `models.membership` | `class-string` | `Tey\Concierge\Models\Membership` | The membership model. Swap it for a subclass. |
+| `models.ownership` | `class-string` | `Tey\Concierge\Models\Ownership` | The ownership model. Swap it for a subclass. |
+| `models.invitation` | `class-string` | `Tey\Concierge\Models\Invitation` | The workspace invitation model. Swap it for a subclass. |
+| `models.tenant_invitation` | `class-string` | `Tey\Concierge\Models\TenantInvitation` | The tenant invitation model. Swap it for a subclass. |
+
+The package migrations read `models.user` and `models.workspace` to find your tables. With either one missing or invalid, Concierge throws `Tey\Concierge\Exceptions\UnsupportedConfiguration` naming the key. [Membership](/features/membership#setting-up-in-order) gives the setup order.
+
+## Roles
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `guard` | `string` or `null` | `null` | The guard name of Concierge's Spatie roles, used when `concierge:sync-roles` creates them and when Concierge looks them up. `null` is `auth.defaults.guard`. |
+| `roles` | `array<string, array>` | `owner`, `admin`, `presenter` | The roles, keyed by name, ordered highest rank first. A member outranks another when their highest role comes earlier in this list. |
+| `roles.*.label` | `string` | `'Owner'`, `'Admin'`, `'Presenter'` | A display name for your app's UI. Concierge itself does not read it. |
+| `roles.*.grantable_by` | `list<string>` | see below | The roles whose holders may grant this role. The owner role is never grantable, whatever this says. |
+| `owner_role` | `string` | `'owner'` | The role a workspace's owner holds. `EstablishWorkspace` and `TransferOwnership` assign it. |
+| `transfer_demotes_to` | `string` | `'admin'` | The role the previous owner holds after `TransferOwnership`. |
+| `managers` | `list<string>` | `['owner', 'admin']` | Roles whose holders may manage members: invite, resend and revoke invitations, change roles, suspend, reinstate and remove. |
+
+The default roles:
+
+```php
+// config/concierge.php
+'roles' => [
+    'owner' => ['label' => 'Owner', 'grantable_by' => []],
+    'admin' => ['label' => 'Admin', 'grantable_by' => ['owner']],
+    'presenter' => ['label' => 'Presenter', 'grantable_by' => ['owner', 'admin']],
+],
+```
+
+Each role is a global Spatie role (team `null`), and every assignment is scoped to a workspace. Run `php artisan concierge:sync-roles` after changing the list: it creates missing roles and deletes none. An action that assigns a role that does not exist throws `UnsupportedConfiguration`.
+
+The rules these keys feed are listed under [Who May Call Them](/reference/actions-and-events#who-may-call-them).
+
+## Invitations
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `invitations.expires_after_days` | `int` | `7` | Days an invitation link works, counted from when it is created or resent. Applies to workspace and tenant invitations. |
+| `invitations.resend_cooldown_seconds` | `int` | `60` | Minimum seconds between creating or resending an invitation and resending it again. Applies to workspace and tenant invitations. |
+| `invitations.deliver` | `bool` | `true` | Whether invitation emails are sent. Set `false` to create invitations without emailing them. Emails also need an invitation URL: see [What Your App Provides](/features/membership#what-your-app-provides). |
+
+## Tenant Invitations
+
+Read only when `features.tenant_invitations` is `true`.
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `tenant_invitations.ability` | `string` | `'concierge.manage-tenants'` | The Gate ability every changing tenant invitation action checks. Define it yourself, or let Concierge define it from `platform_owners`. |
+| `tenant_invitations.platform_owners` | `list<string>` | `[]` | Emails allowed to manage tenant invitations, compared case-insensitively. The account's email must also be verified. Used only when your app does not define the ability itself. |
+| `tenant_invitations.allow_reinvite_after_accept` | `bool` | `false` | When `true`, an email whose invitation was already accepted can be invited again, and accepting creates an additional workspace. When `false`, `InviteTenant` fails validation with "That email already has a workspace." |
+| `tenant_invitations.throttle.inspect` | `int` | `30` | Requests per minute for the `concierge-tenant-invitation-inspect` limiter. |
+| `tenant_invitations.throttle.accept` | `int` | `10` | Requests per minute for the `concierge-tenant-invitation-accept` limiter. |
+| `tenant_invitations.throttle.invite` | `int` | `20` | Requests per minute for the `concierge-tenant-invitation-invite` limiter. |
+
+[Tenant Invitations](/features/tenant-invitations#what-your-app-provides) shows how to apply the limiters to your routes.
+
+## Recent Authentication
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `recent_authentication_seconds` | `int` or `null` | `null` | How long after confirming their password the owner may call `TransferOwnership`. `null` is `auth.password_timeout`, or 10800 seconds (three hours) when that is not set. |
+
+The default check reads the `auth.password_confirmed_at` session value that Laravel's password confirmation sets, for the signed-in user only.
+
+## Local Login
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `local_login.enabled` | `bool` | `false` | Turns [local login](/features/local-login) on. Only `true` turns it on, and only in the `local` environment. |
+| `local_login.account.email` | `string` or `null` | `null` | The identity value of the account to sign in as. Required: local login is unavailable while it is empty. |
+| `local_login.account.name` | `string` or `null` | `null` | The name for an account the click creates. `null` derives one from the email, so `dev@example.test` becomes `Dev`. |
+| `local_login.account.attributes` | `array<string, mixed>` | `[]` | Extra columns for an account the click creates. The identity and password columns are ignored here. |
+| `local_login.identity` | `string` | `'email'` | The column the account is looked up and created by. |
+| `local_login.guard` | `string` or `null` | `null` | The guard to sign in on; it must use an Eloquent user provider. `null` is `auth.defaults.guard`. |
+| `local_login.redirect` | `string` or `null` | `null` | Where to go after signing in when there is no intended URL. `null` is `/`. |
+| `local_login.throttle` | `int` | `10` | Requests per minute per IP for `POST /local-login`. |
