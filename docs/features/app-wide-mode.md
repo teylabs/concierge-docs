@@ -79,7 +79,7 @@ Each is in `Tey\Concierge\Actions` and called with `::run()`. [Actions and Event
 | `ChangeUserRoles::run($actor, $user, $grants)` | Replaces the user's roles. |
 | `RemoveUser::run($actor, $user)` | Clears the user's roles and direct permissions, deletes their account row, then calls `delete()` on the user model. A model with `SoftDeletes` is soft deleted. |
 
-`AcceptInvitation` and `InspectInvitation` work in both modes. In app-wide mode, accepting grants the invitation's roles to the whole app and records the invitation on the account row. `ResendInvitation` and `RevokeInvitation` are for workspace invitations only.
+`AcceptInvitation` and `InspectInvitation` work in both modes. In app-wide mode, accepting grants the invitation's roles to the whole app and records the invitation on the account row. `ResendInvitation` and `RevokeInvitation` are for workspace invitations only for now ([#79](https://github.com/teylabs/concierge/issues/79)).
 
 The workspace actions (`EstablishWorkspace`, `InviteMember`, `ChangeMemberRoles` and the rest) throw `UnsupportedConfiguration` in app-wide mode, naming the app-wide action to use. The app-wide actions do the same in workspace mode.
 

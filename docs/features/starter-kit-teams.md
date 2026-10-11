@@ -84,7 +84,7 @@ A kit's `Team` already has its own memberships and owner, so it takes `ActsAsWor
 With the kit engine, concierge binds two classes in place of its own:
 
 - `Tey\Concierge\Kit\KitMembershipSource`, bound to `Tey\Concierge\Contracts\MembershipSource`, reads a team's members through the team's `memberships()` relation, one person through the same relation, and a person's teams through the user's `teams()` relation. Each member has one role, from the pivot's `role` column. The member whose role is `owner` is the team's owner, and the pivot's `created_at` is when they joined.
-- `Tey\Concierge\Kit\KitWorkspaceContext`, bound to `WorkspaceContext`, finds the current team in the `{current_team}` route parameter (a bound model, or its route key such as a slug), and otherwise in the signed-in user's `current_team_id`. It never checks membership: the kit's own `EnsureTeamMembership` middleware does that.
+- `Tey\Concierge\Kit\KitWorkspaceContext`, bound to `WorkspaceContext`, finds the current team in the `{current_team}` route parameter (a bound model, or its route key such as a slug), and otherwise in the signed-in user's `current_team_id`. It never checks membership: the kit's own `EnsureTeamMembership` middleware does that. Protect kit team routes with that middleware, not `concierge.member`, which doesn't read kit teams yet ([#80](https://github.com/teylabs/concierge/issues/80)).
 
 The adapter reads and never writes. Concierge's write actions refuse a kit team with a `Tey\Concierge\Exceptions\WorkspaceNotManaged` exception that names [#57](https://github.com/teylabs/concierge/issues/57). Change a kit team's members with the kit's own team screens.
 

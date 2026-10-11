@@ -99,7 +99,7 @@ Makes `$user` an active member of the invitation's workspace with the invitation
 - **Throws:** `InvitationRejected`, whose `$state` is the [`InvitationState`](#invitation-states) that stopped it.
 - **Dispatches:** `InvitationAccepted`, except when the same user accepts the same invitation again.
 
-`ResendInvitation` and `RevokeInvitation` are for workspace invitations only.
+`ResendInvitation` and `RevokeInvitation` are for workspace invitations only for now ([#79](https://github.com/teylabs/concierge/issues/79)).
 
 ### ChangeMemberRoles
 

@@ -43,7 +43,7 @@ When mod can't recognize one of these files, it prints the line to add by hand i
 
 ### 2. Import the Stylesheet
 
-Mod does not import concierge's stylesheet, which defines the `--concierge-*` variables the pages are coloured with. In your CSS entry, after `@import 'tailwindcss'`:
+Mod does not import concierge's stylesheet yet ([#81](https://github.com/teylabs/concierge/issues/81)). It defines the `--concierge-*` variables the pages are coloured with. In your CSS entry, after `@import 'tailwindcss'`:
 
 ```css
 /* resources/css/app.css */
