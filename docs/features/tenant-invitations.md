@@ -28,36 +28,23 @@ The switch is read while the package provider registers, so it cannot be set at 
 
 ## Actions
 
-| Action | Who | What it does |
-| --- | --- | --- |
-| `InviteTenant::run($actor, $email)` | platform owner | Creates a pending invitation (one per email) and queues delivery. Returns the invitation and the one-time token. An email whose invitation was already accepted is turned away ("That email already has a workspace.") unless `tenant_invitations.allow_reinvite_after_accept` is `true`, in which case accepting creates an additional workspace. |
-| `ResendTenantInvitation::run($actor, $invitation)` | platform owner | Rotates the token (the old link stops working), renews the expiry and honours `invitations.resend_cooldown_seconds`. The original `inviter_id` is kept; the resender is `actorId` on `TenantInvitationResent`. |
-| `RevokeTenantInvitation::run($actor, $invitation)` | platform owner | Revokes a pending invitation. Revoking twice does nothing; an accepted invitation cannot be revoked. |
-| `InspectTenantInvitation::run($user, $token)` | anyone | Read-only state for your register or sign-in page (see [Invitation States](#invitation-states)). The returned invitation holds the email to lock your register form to. |
-| `AcceptTenantInvitation::run($user, $token)` | the invitee | Creates the workspace and makes `$user` its owner. Running it again for the same user changes nothing. |
-
-The actions live in `Tey\Concierge\Actions`. The `TenantInvitation` model has `outstanding()`, `lapsed()`, `accepted()` and `revoked()` scopes and `workspace` and `inviter` relations: enough for an admin page of tenants and pending, accepted and revoked invitations. `concierge.models.tenant_invitation` swaps the model.
-
-### Invitation States
-
-`InspectTenantInvitation` returns one of these `Tey\Concierge\Enums\InvitationState` cases:
-
-| State | Meaning |
+| Action | Who |
 | --- | --- |
-| `RegisterRequired` | Valid and pending; no account exists for the invited email |
-| `SignInRequired` | Valid and pending; an account exists for the invited email |
-| `Ready` | The signed-in user can accept |
-| `WrongAccount` | The signed-in user's email is not the invited email |
-| `Unverified` | The signed-in user's email is not verified |
-| `Expired`, `Revoked`, `Accepted` | The invitation can no longer be accepted |
-| `AlreadyMember` | The signed-in user already accepted this invitation |
-| `Invalid` | The token does not match an invitation |
+| `InviteTenant::run($actor, $email)` | platform owner |
+| `ResendTenantInvitation::run($actor, $invitation)` | platform owner |
+| `RevokeTenantInvitation::run($actor, $invitation)` | platform owner |
+| `InspectTenantInvitation::run($user, $token)` | anyone holding the token |
+| `AcceptTenantInvitation::run($user, $token)` | the invitee |
+
+The actions live in `Tey\Concierge\Actions`. What each one returns, throws and dispatches, and the [invitation states](/reference/actions-and-events#invitation-states) the inspect action returns, are in [Actions and Events](/reference/actions-and-events#tenant-invitation-actions).
+
+The `TenantInvitation` model has `outstanding()`, `lapsed()`, `accepted()` and `revoked()` scopes and `workspace` and `inviter` relations: enough for an admin page of tenants and pending, accepted and revoked invitations. `concierge.models.tenant_invitation` swaps the model.
 
 `SignInRequired` and `RegisterRequired` reveal only whether the invited address has an account, only to someone holding a valid, pending token, and the inspect rate limiter bounds them. Invalid, expired, revoked and accepted tokens reveal nothing.
 
 ## Authorization
 
-Platform ownership lives outside workspaces and permission teams. Every action that changes something checks one Gate ability, `concierge.tenant_invitations.ability` (default `concierge.manage-tenants`):
+Platform ownership lives outside workspaces and permission teams. Every action that changes something checks one Gate ability, [`tenant_invitations.ability`](/reference/configuration#tenant-invitations) (default `concierge.manage-tenants`):
 
 1. Define it yourself, for full control:
 
@@ -124,9 +111,11 @@ Concierge::tenantInvitationUrlUsing(fn (TenantInvitation $invitation, string $to
 
 | Limiter | Applies per | Limit key |
 | --- | --- | --- |
-| `throttle:concierge-tenant-invitation-inspect` | IP and token | `tenant_invitations.throttle.inspect` (30 a minute) |
-| `throttle:concierge-tenant-invitation-accept` | IP, token and signed-in user | `tenant_invitations.throttle.accept` (10 a minute) |
-| `throttle:concierge-tenant-invitation-invite` | signed-in user (IP for a guest) | `tenant_invitations.throttle.invite` (20 a minute) |
+| `throttle:concierge-tenant-invitation-inspect` | IP and token | `tenant_invitations.throttle.inspect` |
+| `throttle:concierge-tenant-invitation-accept` | IP, token and signed-in user | `tenant_invitations.throttle.accept` |
+| `throttle:concierge-tenant-invitation-invite` | signed-in user (IP for a guest) | `tenant_invitations.throttle.invite` |
+
+The limits and their defaults are in [Configuration](/reference/configuration#tenant-invitations).
 
 ## Multitenancy Packages
 

@@ -25,7 +25,7 @@ Local login works without membership, so an app can use it alone.
 
 ## What Your App Provides
 
-Concierge provides the actions, events, models and optional Vue pages. Your app keeps its own:
+Concierge provides the [actions and events](/reference/actions-and-events), models and optional Vue pages. Your app keeps its own:
 
 - routes, controllers and policies that call the actions
 - authentication: login, registration, password confirmation (a starter kit or Fortify)

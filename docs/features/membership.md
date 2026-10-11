@@ -110,31 +110,11 @@ Roles are listed in `config/concierge.php`, highest rank first. Each role names 
 
 Each role is a global Spatie role, and every assignment is scoped to a workspace. Run `php artisan concierge:sync-roles` after changing the list.
 
-| Key | Default | Purpose |
-| --- | --- | --- |
-| `owner_role` | `'owner'` | The role held by a workspace's owner |
-| `transfer_demotes_to` | `'admin'` | The role the previous owner keeps after a transfer |
-| `managers` | `['owner', 'admin']` | Roles that may invite and manage members |
-| `invitations.expires_after_days` | `7` | How long an invitation link works |
-| `invitations.resend_cooldown_seconds` | `60` | Minimum time between resends |
+The owner role, the role a previous owner keeps after a transfer, the roles that may manage members and the invitation timings are set in the same file; see [Configuration](/reference/configuration#roles).
 
 ## Actions
 
-Every operation is an action class in `Tey\Concierge\Actions`, called with `::run()`. Actions that change a membership take the acting user first and check the grant rules before writing.
-
-| Action | What it does |
-| --- | --- |
-| `EstablishWorkspace::run($workspace, $owner)` | Makes `$owner` the owner of a new workspace |
-| `InviteMember::run($actor, $workspace, $email, $grants)` | Creates an invitation with the roles in `$grants` (a `Tey\Concierge\Support\GrantSet`) |
-| `ResendInvitation::run($actor, $invitation)` | Rotates the token (the old link stops working) and renews the expiry |
-| `RevokeInvitation::run($actor, $invitation)` | Revokes a pending invitation |
-| `InspectInvitation::run($user, $token)` | Read-only state of an invitation, for the acceptance page |
-| `AcceptInvitation::run($user, $token)` | Accepts the invitation and creates the membership |
-| `ChangeMemberRoles::run($actor, $membership, $grants)` | Replaces a member's roles |
-| `SuspendMembership::run($actor, $membership, $reason)` | Suspends a membership; `$reason` is optional |
-| `ReinstateMembership::run($actor, $membership)` | Restores a suspended membership with the roles it held |
-| `RemoveMembership::run($actor, $membership)` | Ends membership in that workspace only |
-| `TransferOwnership::run($actor, $recipient)` | Makes another member the owner |
+Every operation is an action class in `Tey\Concierge\Actions`, called with `::run()`. Actions that change a membership take the acting user first and check the grant rules before writing. Start by making a user the owner of a new workspace:
 
 ```php
 use App\Models\User;
@@ -147,7 +127,7 @@ $workspace = Workspace::create(['name' => 'Acme']);
 EstablishWorkspace::run($workspace, $owner);
 ```
 
-Actions that change something dispatch an event from `Tey\Concierge\Events`, such as `MemberInvited` and `OwnershipTransferred`.
+The other actions invite, resend, revoke, inspect and accept invitations, and change roles, suspend, reinstate, remove and transfer ownership. Each one's arguments, rules, results and exceptions, and the events they dispatch, are listed in [Actions and Events](/reference/actions-and-events).
 
 ## Protecting Routes
 
