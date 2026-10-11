@@ -164,6 +164,19 @@ Makes `$recipient` the workspace owner. The recipient gets the `owner_role`; the
 - **Throws:** `AuthorizationException` with code `not_owner` when `$actor` is not the active owner, `recent_auth_required` when the password was not confirmed recently, or `recipient_invalid` when the recipient is not another active member of the same workspace with a verified email.
 - **Dispatches:** `OwnershipTransferred`.
 
+### ForcePasswordReset
+
+```php
+ForcePasswordReset::run(Member $actor, Membership $membership, bool $resetTwoFactor = false): ForcedPasswordReset
+```
+
+Locks the member's account down: replaces the password with the hash of a random value nobody knows, replaces the remember-me token, deletes the person's sessions when the session driver is `database`, clears the configured two-factor columns when `$resetTwoFactor` is `true`, and sends a reset link through the user's own `sendPasswordResetNotification()`. See [Forced Password Reset](/features/forced-password-reset).
+
+- **Who may call it:** a manager who outranks the member. Not on their own membership or the owner's. When `recent_authentication_seconds` is set, the actor must have confirmed their password within it. The [`AccountGuard`](#account-guard) must allow it.
+- **Returns:** `Tey\Concierge\Support\ForcedPasswordReset`, with `$membership`, `bool $twoFactorReset` and `?int $sessionsEnded` (database session rows deleted, or `null` with any other session driver).
+- **Throws:** `AuthorizationException` from the grant policy, with code `not_member` when the membership was removed, `recent_auth_required` when the password was not confirmed recently, or the denial your `AccountGuard` returns. `UnsupportedConfiguration` when the user model is not `Authenticatable` and `CanResetPassword`, the broker is not Laravel's, or `$resetTwoFactor` is `true` and none of `forced_password_reset.two_factor_columns` exist on the user table.
+- **Dispatches:** `PasswordResetForced`.
+
 ### SyncRoleDefinitions
 
 ```php
@@ -271,6 +284,16 @@ The membership actions that manage other members ask the grant policy, `Tey\Conc
 
 Bind your own class to `Tey\Concierge\Contracts\GrantPolicy` in a service provider to change these rules. The tenant invitation actions check the `tenant_invitations.ability` Gate ability instead; see [Authorization](/features/tenant-invitations#authorization).
 
+### Account Guard
+
+`Tey\Concierge\Contracts\AccountGuard` is a veto your app can place on operations on particular accounts, checked after the grant policy passes. `ForcePasswordReset` asks it with the operation `AccountGuard::FORCE_PASSWORD_RESET`:
+
+```php
+public function authorize(string $operation, Member $actor, Member $target): Response;
+```
+
+The default, `Tey\Concierge\Support\OpenAccountGuard`, allows everything. Bind your own class to `AccountGuard` in a service provider to protect an account; [Protecting Accounts](/features/forced-password-reset#protecting-accounts) has an example.
+
 ## Invitation States
 
 `Tey\Concierge\Enums\InvitationState` is what the inspect actions return and what `InvitationRejected::$state` holds.
@@ -310,6 +333,7 @@ Every event is in `Tey\Concierge\Events`, is dispatched only after the transacti
 | `MembershipReinstated` | `ReinstateMembership` reinstates a membership | `int $workspaceId`, `int $membershipId`, `?int $actorId` |
 | `MembershipRemoved` | `RemoveMembership` removes a membership | `int $workspaceId`, `int $membershipId`, `?int $actorId` |
 | `OwnershipTransferred` | `TransferOwnership` changes the owner | `int $workspaceId`, `int $fromMembershipId`, `int $toMembershipId`, `?int $actorId` |
+| `PasswordResetForced` | `ForcePasswordReset` locks an account down | `int $workspaceId`, `int $membershipId`, `int $userId`, `?int $actorId`, `bool $twoFactorReset`, `?int $sessionsEnded` |
 | `TenantInvited` | `InviteTenant` creates a tenant invitation | `int $invitationId`, `?int $actorId` |
 | `TenantInvitationResent` | `ResendTenantInvitation` rotates a token | `int $invitationId`, `int $generation`, `?int $actorId` |
 | `TenantInvitationRevoked` | `RevokeTenantInvitation` revokes a tenant invitation | `int $invitationId`, `?int $actorId` |

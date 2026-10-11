@@ -7,6 +7,7 @@ Concierge includes optional Vue 3 pages for managing members and invitations, pl
 | `MembersPage`, `InviteMemberPage`, `MemberPage`, `AcceptInvitationPage` | `@tey/concierge` | Pages; each takes the matching generated `*PageProps` type as its props |
 | `createConcierge({ adapter, labels?, locale? })` | `@tey/concierge` | The Vue plugin every page requires |
 | `LocalLoginButton` | `@tey/concierge` | A plain form for one-click [local login](/features/local-login); needs no plugin and no Inertia |
+| `Avatar` | `@tey/concierge` | A person's photo, or their initials on a stable colour; see [Avatars](/features/avatars) |
 | `ConciergeAdapter`, `defaultLabels` and the generated contract types | `@tey/concierge` | Types for your own code |
 | `createInertiaAdapter()` | `@tey/concierge/inertia` | The adapter for Inertia; the only module that imports `@inertiajs/vue3` |
 
@@ -43,7 +44,7 @@ In your CSS entry, after `@import 'tailwindcss'`:
 @import '../../vendor/tey/concierge/resources/css/concierge.css';
 ```
 
-This registers the package sources with `@source` and defines the `--concierge-*` variables. Override any variable in an unlayered `:root` rule to restyle the pages.
+This registers the package sources with `@source` and defines the `--concierge-*` variables. Override any variable in an unlayered `:root` rule to restyle the pages, including the [avatar colours](/features/avatars#colours).
 
 ### 3. The Plugin
 
@@ -70,6 +71,8 @@ Your app keeps its layout, breadcrumbs and flash messages. Pass the server props
 ```
 
 Every page has the slots `header`, `breadcrumbs` and `aside`. `MembersPage` also has `empty`.
+
+The members list and the member header show each person's [avatar](/features/avatars). Build each `UserSummary` with `UserSummary::for($user)`, and set `Concierge::avatarUsing()` if your app has photos.
 
 ## How the Pages Talk to Your Server
 

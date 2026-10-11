@@ -24,6 +24,8 @@ export async function publishMarkdown({ sidebar, srcDir, outDir }) {
     '',
     '- A Laravel 13 app needs invitations, memberships, ownership and role grants scoped to a workspace (a team or organization), built on spatie/laravel-permission teams.',
     '- An invite-only SaaS app wants a platform owner to invite someone who then gets their own new workspace (tenant invitations).',
+    '- An app wants to limit who may register: anyone, allowed email domains, invitation only, or no one, with invited people still let in.',
+    '- A manager needs to lock a compromised account down: a password nobody knows, its sessions ended and a reset link sent.',
     '- A developer wants one-click sign-in as a configured account in local development, off in every other environment.',
     '- A Vue and Inertia app wants ready-made pages for members, invitations and accepting an invitation.',
     '',
