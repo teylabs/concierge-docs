@@ -150,8 +150,11 @@ export default defineConfig({
         text: 'Features',
         items: [
           { text: 'Membership', link: '/features/membership' },
+          { text: 'App-wide mode', link: '/features/app-wide-mode' },
+          { text: 'Starter kit teams', link: '/features/starter-kit-teams' },
           { text: 'Tenant invitations', link: '/features/tenant-invitations' },
           { text: 'Registration', link: '/features/registration' },
+          { text: 'Users', link: '/features/users' },
           { text: 'Forced password reset', link: '/features/forced-password-reset' },
           { text: 'Local login', link: '/features/local-login' },
           { text: 'Vue pages', link: '/features/vue-pages' },

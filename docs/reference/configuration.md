@@ -11,12 +11,21 @@ php artisan vendor:publish --tag="concierge-config"
 
 Only the two `registration` keys read environment variables, `CONCIERGE_REGISTRATION` and `CONCIERGE_REGISTRATION_DOMAINS`. Set every other value in the file itself. Local login also checks `APP_ENV` directly; see [When It Is Available](/features/local-login#when-it-is-available).
 
+## Mode
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `mode` | `'app'`, `'workspaces'` or `null` | `null` | Where invitations and roles apply. `'app'` is the whole app, with Spatie teams off and no workspace model ([App-Wide Mode](/features/app-wide-mode)). `'workspaces'` is one workspace at a time ([Membership](/features/membership)). `null` is `'app'`, except that while `models.workspace` is set it is `'workspaces'`: that transition rule is removed at 1.0. Any other value throws `UnsupportedConfiguration` at boot. |
+| `workspaces.engine` | `'concierge'`, `'kit'` or `null` | `'concierge'` | Read in workspace mode only. `'concierge'` keeps members in concierge's own tables, with Spatie teams on. `'kit'` reads a starter kit's teams and never writes them, with Spatie teams off ([Starter Kit Teams](/features/starter-kit-teams)). `null` is `'concierge'`. |
+
+Both describe your schema, so set them in `config/concierge.php`, never from the environment. `php artisan about` shows the mode and the engine.
+
 ## Features
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `features.membership` | `bool` | `true` | Turns [membership](/features/membership) on. Only `false` turns it off. When off, Concierge registers no membership bindings, no `concierge.member` middleware alias and no `concierge:sync-roles` command, and does not run its migration. |
-| `features.tenant_invitations` | `bool` | `false` | Turns [tenant invitations](/features/tenant-invitations) on. Only `true` turns it on, and only while membership is on. When off, there is no tenant invitations migration, rate limiter or Gate definition. |
+| `features.membership` | `bool` | `true` | Turns [membership](/features/membership) on. Only `false` turns it off. When off, Concierge registers no membership bindings, no `concierge.member` or `concierge.active` middleware alias and no `concierge:sync-roles` command, and does not run its migrations. |
+| `features.tenant_invitations` | `bool` | `false` | Turns [tenant invitations](/features/tenant-invitations) on. Only `true` turns it on, and only while membership is on. When off, there is no tenant invitations migration, rate limiter or Gate definition. Workspace mode only: with `'mode' => 'app'` it fails at boot. |
 
 Both switches are read while the package provider registers, so set them in `config/concierge.php`, not at runtime. Set `features.tenant_invitations` before publishing migrations.
 
@@ -25,13 +34,14 @@ Both switches are read while the package provider registers, so set them in `con
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `models.user` | `class-string` or `null` | `null` | Your user model. Required for membership. It must be an Eloquent model implementing `Tey\Concierge\Contracts\Member`, use Spatie's `HasRoles` and have an incrementing integer key. |
-| `models.workspace` | `class-string` or `null` | `null` | Your workspace model. Required for membership. It must be an Eloquent model implementing `Tey\Concierge\Contracts\Workspace`, with an incrementing integer key. |
+| `models.workspace` | `class-string` or `null` | `null` | Your workspace model. Required in workspace mode, and left `null` in app-wide mode. It must be an Eloquent model implementing `Tey\Concierge\Contracts\Workspace`, with an incrementing integer key. |
 | `models.membership` | `class-string` | `Tey\Concierge\Models\Membership` | The membership model. Swap it for a subclass. |
 | `models.ownership` | `class-string` | `Tey\Concierge\Models\Ownership` | The ownership model. Swap it for a subclass. |
 | `models.invitation` | `class-string` | `Tey\Concierge\Models\Invitation` | The workspace invitation model. Swap it for a subclass. |
 | `models.tenant_invitation` | `class-string` | `Tey\Concierge\Models\TenantInvitation` | The tenant invitation model. Swap it for a subclass. |
+| `models.account` | `class-string` | `Tey\Concierge\Models\Account` | The [account](/features/app-wide-mode#the-accounts-table) model, one row per user in `concierge_accounts`. Swap it for a subclass. |
 
-The package migrations read `models.user` and `models.workspace` to find your tables. With either one missing or invalid, Concierge throws `Tey\Concierge\Exceptions\UnsupportedConfiguration` naming the key. [Membership](/features/membership#setting-up-in-order) gives the setup order.
+The package migrations read `models.user` and, in workspace mode, `models.workspace` to find your tables. With a required one missing or invalid, Concierge throws `Tey\Concierge\Exceptions\UnsupportedConfiguration` naming the key. [Membership](/features/membership#setting-up-in-order) gives the setup order.
 
 ## Roles
 
@@ -56,7 +66,7 @@ The default roles:
 ],
 ```
 
-Each role is a global Spatie role (team `null`), and every assignment is scoped to a workspace. Run `php artisan concierge:sync-roles` after changing the list: it creates missing roles and deletes none. An action that assigns a role that does not exist throws `UnsupportedConfiguration`.
+Each role is a global Spatie role (team `null`). In workspace mode every assignment is scoped to a workspace; in app-wide mode it applies to the whole app, and the owner role may be held by several owners. Run `php artisan concierge:sync-roles` after changing the list: it creates missing roles and deletes none. An action that assigns a role that does not exist throws `UnsupportedConfiguration`.
 
 The rules these keys feed are listed under [Who May Call Them](/reference/actions-and-events#who-may-call-them).
 
