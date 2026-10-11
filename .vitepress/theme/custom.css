@@ -1,0 +1,80 @@
+/* Site-wide pre-1.0 notice, above the nav. */
+.stability-banner {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* `memo="…"`: where the snippet goes, in a bar above the code. Not copied. */
+.vp-doc .code-memo__bar {
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-2);
+  background: var(--vp-code-block-bg);
+  font-family: var(--vp-font-family-mono);
+  font-size: 12px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* `at="boot()"`: where in the file, after the path: `path → boot()`. */
+.vp-doc .code-memo__at {
+  white-space: nowrap;
+}
+.vp-doc .code-memo__at::before {
+  content: ' → ';
+  color: var(--vp-c-text-3);
+}
+
+/* The copy button appears top-right on hover; with a memo bar there, it
+   sits just below the bar instead of on top of the placement. */
+.vp-doc div.code-memo > button.copy {
+  top: calc(41px + 12px);
+}
+
+/* A code group whose tabs share a memo shows it once, above the tabs. */
+.vp-doc .code-memo-group > .code-memo__bar {
+  background: var(--vp-code-tab-bg);
+}
+@media (min-width: 640px) {
+  .vp-doc .code-memo-group > .code-memo__bar {
+    border-radius: 8px 8px 0 0;
+  }
+  .vp-doc .code-memo-group > .tabs {
+    border-radius: 0;
+  }
+}
+
+/* The default theme hides the footer on pages with a sidebar, which is every
+   page here; show it, clear of the sidebar. `.Layout` outranks the theme's
+   scoped rule. */
+.Layout .VPFooter.has-sidebar {
+  display: block;
+}
+@media (min-width: 960px) {
+  .Layout .VPFooter.has-sidebar {
+    padding-left: calc(var(--vp-sidebar-width) + 32px);
+  }
+}
+@media (min-width: 1440px) {
+  .Layout .VPFooter.has-sidebar {
+    padding-left: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
+  }
+}
+
+/* The credit line breaks into two lines on narrow screens, at the middle
+   dot, and the dot is hidden (Tey Labs brand guide). */
+@media (max-width: 639px) {
+  .credit-line__copy,
+  .credit-line__built {
+    display: block;
+  }
+  .credit-line__dot {
+    display: none;
+  }
+}

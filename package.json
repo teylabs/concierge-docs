@@ -1,0 +1,14 @@
+{
+  "name": "concierge-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "npm test && vitepress build",
+    "preview": "vitepress preview --port 5299",
+    "test": "node --test scripts/*.test.mjs"
+  },
+  "devDependencies": {
+    "vitepress": "^2.0.0-alpha.20"
+  }
+}
