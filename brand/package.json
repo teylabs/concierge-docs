@@ -1,0 +1,15 @@
+{
+  "name": "concierge-brand",
+  "private": true,
+  "type": "module",
+  "description": "Generates the Concierge brand kit from build.mjs.",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-mono": "5.2.5",
+    "@fontsource/schibsted-grotesk": "5.2.5",
+    "opentype.js": "1.3.4",
+    "sharp": "0.33.5"
+  }
+}
