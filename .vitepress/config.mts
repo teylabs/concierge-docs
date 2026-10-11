@@ -130,6 +130,7 @@ export default defineConfig({
 
     nav: [
       { text: 'Guide', link: '/guide/introduction', activeMatch: '^/(guide|features)/' },
+      { text: 'Reference', link: '/reference/configuration', activeMatch: '^/reference/' },
       { text: 'What concierge covers', link: '/roadmap', activeMatch: '^/roadmap' },
       { text: 'Changelog', link: 'https://github.com/teylabs/concierge/blob/main/CHANGELOG.md' },
     ],
@@ -152,6 +153,13 @@ export default defineConfig({
           { text: 'Tenant invitations', link: '/features/tenant-invitations' },
           { text: 'Local login', link: '/features/local-login' },
           { text: 'Vue pages', link: '/features/vue-pages' },
+        ],
+      },
+      {
+        text: 'Reference',
+        items: [
+          { text: 'Configuration', link: '/reference/configuration' },
+          { text: 'Actions and events', link: '/reference/actions-and-events' },
         ],
       },
       {

@@ -76,13 +76,4 @@ The switch is read while the package provider registers, so set it in `config/co
 
 ## Configuration
 
-| Key | Default | Purpose |
-| --- | --- | --- |
-| `local_login.enabled` | `false` | Turns local login on |
-| `local_login.account.email` | `null` | The account to sign in as. Required |
-| `local_login.account.name` | `null` | The name for an account the click creates |
-| `local_login.account.attributes` | `[]` | Extra columns for a created account |
-| `local_login.identity` | `'email'` | The column the account is looked up and created by |
-| `local_login.guard` | `null` | The guard to sign in on; `null` is the default guard |
-| `local_login.redirect` | `null` | Where to go when there is no intended URL; `null` is `/` |
-| `local_login.throttle` | `10` | Requests per minute per IP |
+Every `local_login` key, with its type and default, is in [Configuration](/reference/configuration#local-login).

@@ -19,7 +19,7 @@ php artisan vendor:publish --tag="concierge-config"
 # -> config/concierge.php
 ```
 
-Values in your `config/concierge.php` take precedence over the package defaults. The published file lists every key, with a comment on each.
+Values in your `config/concierge.php` take precedence over the package defaults. [Configuration](/reference/configuration) lists every key, with its type and default.
 
 ## Choosing Features
 
