@@ -14,9 +14,10 @@ composer require tey/concierge
 php artisan concierge:install
 ```
 
-`concierge:install` is planned for 0.8. When the plan is complete:
+`concierge:install` is planned for 0.8. When the plan is complete, concierge works with all four official starter kits (Vue, React, Svelte and Livewire, including their WorkOS AuthKit variants), with or without their teams:
 
-- `concierge:install` detects the starter kit and scaffolds concierge's pages into the app, written with that kit's own components and layout: Vue, React or Livewire ([#57](https://github.com/teylabs/concierge/issues/57)). The app owns the pages; the logic stays in the package and updates with `composer update`.
+- `concierge:install` detects the starter kit and scaffolds concierge's pages into the app, written with that kit's own components and layout ([#57](https://github.com/teylabs/concierge/issues/57)). The app owns the pages; the logic stays in the package and updates with `composer update`.
+- When the kit was generated with teams, concierge builds on the kit's own teams, memberships and invitations, and its pages extend the kit's team screens ([#20](https://github.com/teylabs/concierge/issues/20)). Without teams, invitations and roles apply to the whole app ([#19](https://github.com/teylabs/concierge/issues/19)).
 - The app's first owner signs in: one click in local development, created on deploy in production.
 - An app without a starter kit has an option too: concierge's packaged Vue components, a standalone portal at its own URL, or headless use with the app's own pages.
 
@@ -49,7 +50,7 @@ php artisan concierge:install
 [Milestone 0.7](https://github.com/teylabs/concierge/milestone/3): with or without workspaces, with or without existing sign-in, plus the user administration every app needs.
 
 - App-wide mode: invitations and roles without workspaces ([#19](https://github.com/teylabs/concierge/issues/19))
-- Use an app's existing team or organization model as the workspace ([#20](https://github.com/teylabs/concierge/issues/20))
+- Use an app's existing team or organization model as the workspace, including a starter kit's own teams ([#20](https://github.com/teylabs/concierge/issues/20))
 - Upgrade an app from app-wide mode to workspaces ([#21](https://github.com/teylabs/concierge/issues/21))
 - Sign-in for apps that have no authentication ([#23](https://github.com/teylabs/concierge/issues/23))
 - App-wide user admin: list, edit, change role, remove ([#43](https://github.com/teylabs/concierge/issues/43))
@@ -79,6 +80,7 @@ php artisan concierge:install
 
 - Scaffold native pages for each starter kit, with options for apps without one ([#57](https://github.com/teylabs/concierge/issues/57))
 - React starter kit pages, scaffolded with the kit's own components ([#40](https://github.com/teylabs/concierge/issues/40))
+- Svelte starter kit pages, scaffolded with the kit's own components ([#58](https://github.com/teylabs/concierge/issues/58))
 - Livewire starter kit pages, scaffolded with the kit's own components ([#41](https://github.com/teylabs/concierge/issues/41))
 - A standalone portal served from a prebuilt bundle ([#32](https://github.com/teylabs/concierge/issues/32))
 - A portal header with "return to app", the app's name and logo ([#33](https://github.com/teylabs/concierge/issues/33))
