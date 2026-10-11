@@ -1,5 +1,23 @@
-/* Site-wide pre-1.0 notice, above the nav. */
+/* Site-wide pre-1.0 notice, above the nav. Until the script measures it,
+   the height is one line, or two on a phone where the text wraps, so the
+   first paint doesn't overlap the nav. */
+:root {
+  --vp-layout-top-height: 33px;
+}
+@media (max-width: 459px) {
+  :root {
+    --vp-layout-top-height: 53px;
+  }
+}
+
 .stability-banner {
+  /* Fixed like the nav under it. The theme makes room for it through
+     --vp-layout-top-height (content margin, hero, local nav, sidebar). */
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: var(--vp-z-index-layout-top);
   padding: 6px 16px;
   border-bottom: 1px solid var(--vp-c-divider);
   background: var(--vp-c-bg-soft);
