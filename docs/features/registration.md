@@ -1,6 +1,6 @@
 # Registration
 
-Registration gating decides who may create an account through your app's registration form. It is one setting, read from the environment, and concierge enforces it where the app creates accounts. With Fortify, which the starter kits use, it takes effect with no app code. It works with or without [membership](/features/membership).
+Registration gating decides who may create an account through your app's registration form. It is one setting, read from the environment, and concierge enforces it where the app creates accounts. With Fortify, which the starter kits use, `open`, `closed` and domain-only registration take effect with no app code; letting invited people in takes one hidden field. It works with or without [membership](/features/membership).
 
 ```dotenv
 CONCIERGE_REGISTRATION=domains
@@ -44,18 +44,38 @@ The domain is the part of the email after the last `@`, compared case-insensitiv
 
 In `invitation` and `domains` modes, a valid invitation admits the person it was sent to. A valid invitation is a pending, unexpired membership invitation, or [tenant invitation](/features/tenant-invitations) when that feature is on, whose email matches the one being registered, case-insensitively. With membership off, no invitation admits anyone.
 
-The token is read from the request that creates the account, under `invitation`. It is the same token as in the invitation link, so a register page reached from `/register?invitation=TOKEN` should send it back in a hidden field named `invitation`. The token is checked on that request, not when the page is shown. Expired, revoked, already accepted and forged tokens, and a token for another email, are refused with a message that says what to do.
+The token is read from the request that creates the account, under `invitation`. It is the same token as in the invitation link, so a register page reached from `/register?invitation=TOKEN` should send it back in a hidden field named `invitation` ([With Fortify](#with-fortify) shows how). The token is checked on that request, not when the page is shown. Expired, revoked, already accepted and forged tokens, and a token for another email, are refused with a message that says what to do.
 
 Registering does not accept the invitation. The person still verifies their email and accepts through your accept route, as before. Once accepted, the token no longer admits anyone.
 
 ## With Fortify
 
-When `laravel/fortify` is installed, concierge wraps the user creator the app binds with `Fortify::createUsersUsing()` and the register view it binds with `Fortify::registerView()`. Nothing in the app changes:
+When `laravel/fortify` is installed, concierge wraps the user creator the app binds with `Fortify::createUsersUsing()` and the register view it binds with `Fortify::registerView()`. The gate runs without changes to your app's actions or routes:
 
 - A refusal is a validation error on the email field, shown by your kit's own form. The kit's own validation still runs after the gate.
 - In `closed` mode the register page and `POST /register` are a 404.
 - The wrapping works whichever service provider boots first.
 - The mode is read on each request, so changing it needs no route rebuild. With a cached configuration, run `php artisan config:cache` again after changing it.
+- In `invitation` mode, and for invitees outside your domains in `domains` mode, the kit's register form has to send the invitation token back. Add a hidden `invitation` field, filled from `?invitation=` on the register page. Concierge will carry it for you once [#67](https://github.com/teylabs/concierge/issues/67) lands.
+
+In the Vue starter kit, add the field to the register form in `resources/js/pages/auth/Register.vue`:
+
+```vue
+<script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
+
+// ...the kit's existing imports
+
+const invitation = new URL(usePage().url, 'http://localhost').searchParams.get('invitation') ?? '';
+</script>
+
+<template>
+    <!-- inside the kit's existing register <Form> -->
+    <input type="hidden" name="invitation" :value="invitation" />
+</template>
+```
+
+Reading the query from the Inertia page URL rather than `window.location` keeps it working with server-side rendering. A form built with `useForm()` instead of `<Form>` adds `invitation` to its data rather than an input.
 
 ## Without Fortify
 

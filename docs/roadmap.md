@@ -54,7 +54,7 @@ php artisan concierge:install
 
 - Routes, pages and providers run through mod's host API ([#17](https://github.com/teylabs/concierge/issues/17))
 - Require `tey/mod` ([#18](https://github.com/teylabs/concierge/issues/18))
-- `php artisan concierge:pages` writes concierge's pages into your app for you to own and edit
+- `php artisan concierge:pages` writes concierge's pages into your app for you to own and edit ([#18](https://github.com/teylabs/concierge/issues/18))
 
 ### 0.8: Meets Any App Where It's At
 
