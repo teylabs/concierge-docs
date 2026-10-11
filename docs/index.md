@@ -39,6 +39,17 @@ features:
 
 Concierge adds a standard suite of essentials and plumbing beyond Laravel's starter kits, so every app you build has a consistent foundation between `laravel new` and the product you're building.
 
+## Glue, With the Decisions Made
+
+Concierge doesn't reinvent the parts. It builds on the packages you'd choose anyway, such as spatie/laravel-permission for roles, and on your starter kit's own sign-in. What it adds is carefully crafted glue between them, with the decisions already figured out for you:
+
+- who may invite whom, and at what role
+- that the last owner can't be removed or demoted
+- that an invitation belongs to one email, expires and can be revoked
+- that local login can never reach production
+
+Each decision is tested, and each one fires an event or reads a setting, so your app can react or choose differently when it needs to.
+
 ## Install
 
 ```bash
