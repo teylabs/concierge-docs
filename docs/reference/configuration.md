@@ -9,7 +9,7 @@ php artisan vendor:publish --tag="concierge-config"
 # -> config/concierge.php
 ```
 
-No key reads an environment variable: set values in the file itself. Local login also checks `APP_ENV` directly; see [When It Is Available](/features/local-login#when-it-is-available).
+Only the two `registration` keys read environment variables, `CONCIERGE_REGISTRATION` and `CONCIERGE_REGISTRATION_DOMAINS`. Set every other value in the file itself. Local login also checks `APP_ENV` directly; see [When It Is Available](/features/local-login#when-it-is-available).
 
 ## Features
 
@@ -87,9 +87,27 @@ Read only when `features.tenant_invitations` is `true`.
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `recent_authentication_seconds` | `int` or `null` | `null` | How long after confirming their password the owner may call `TransferOwnership`. `null` is `auth.password_timeout`, or 10800 seconds (three hours) when that is not set. |
+| `recent_authentication_seconds` | `int` or `null` | `null` | How long after confirming their password the owner may call `TransferOwnership`. `null` is `auth.password_timeout`, or 10800 seconds (three hours) when that is not set. When it is set, `ForcePasswordReset` also requires the manager to have confirmed their password within it; when `null`, `ForcePasswordReset` does not check. |
 
 The default check reads the `auth.password_confirmed_at` session value that Laravel's password confirmation sets, for the signed-in user only.
+
+## Registration
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `registration.mode` | `string` | `'open'`, from `CONCIERGE_REGISTRATION` | Who may [register](/features/registration): `open`, `domains`, `invitation` or `closed`. Any other value, including an empty one, counts as `closed`. |
+| `registration.domains` | `string` or `list<string>` | `''`, from `CONCIERGE_REGISTRATION_DOMAINS` | The email domains allowed in `domains` mode, comma-separated or as an array. Compared case-insensitively; a subdomain matches only when listed. With none, `domains` mode counts as `closed`. |
+
+The mode is read on each request. With Fortify installed it takes effect with no app code; otherwise add the `MayRegister` rule ([Without Fortify](/features/registration#without-fortify)).
+
+## Forced Password Reset
+
+| Key | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `forced_password_reset.broker` | `string` or `null` | `null` | The password broker (`auth.passwords`) that issues the reset link. `null` is the default broker. |
+| `forced_password_reset.two_factor_columns` | `list<string>` | `['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at']` | The user columns set to `null` when a reset asks for two-factor to be reset. Only those on the user table are cleared; with none present, asking throws `UnsupportedConfiguration`. |
+
+[Forced Password Reset](/features/forced-password-reset) explains sessions and the account guard.
 
 ## Local Login
 

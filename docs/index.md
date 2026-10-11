@@ -29,6 +29,12 @@ features:
   - title: Tenant invitations
     details: A platform owner invites an email, and accepting gives that person their own new workspace.
     link: /features/tenant-invitations
+  - title: Registration
+    details: Open, allowed email domains, invitation only or closed, with invited people let in. One setting, and it fails closed.
+    link: /features/registration
+  - title: Forced password reset
+    details: Lock a compromised account down with a password nobody knows, and send the person a reset link.
+    link: /features/forced-password-reset
   - title: Local login
     details: One-click sign-in as a configured account, in the local environment only.
     link: /features/local-login
@@ -46,6 +52,7 @@ Concierge doesn't reinvent the parts. It builds on the packages you'd choose any
 - who may invite whom, and at what role
 - that the last owner can't be removed or demoted
 - that an invitation belongs to one email, expires and can be revoked
+- that you can close sign-up to strangers and still let invited people in
 - that local login can never reach production
 
 Each decision is tested, and each one fires an event or reads a setting, so your app can react or choose differently when it needs to.

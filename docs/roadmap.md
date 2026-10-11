@@ -2,8 +2,10 @@
 
 Concierge is working toward 1.0 in public. This page is the plan: everything below is **planned and not yet released**, unless it is marked done. What ships today is in the [introduction](/guide/introduction).
 
+The canonical list is [ROADMAP.md](https://github.com/teylabs/concierge/blob/main/ROADMAP.md) in the repository; this page explains it.
+
 > [!NOTE]
-> This page describes plans, not features. Milestones and issues on GitHub are the source of truth: [teylabs/concierge milestones](https://github.com/teylabs/concierge/milestones).
+> This page describes plans, not features. Versions are milestones, not dates. Milestones and issues on GitHub are the source of truth: [teylabs/concierge milestones](https://github.com/teylabs/concierge/milestones).
 
 ## The End Goal
 
@@ -14,7 +16,7 @@ composer require tey/concierge
 php artisan concierge:install
 ```
 
-`concierge:install` is planned for 0.8. When the plan is complete, concierge works with all four official starter kits (Vue, React, Svelte and Livewire, including their WorkOS AuthKit variants), with or without their teams:
+`concierge:install` is planned for 0.9. When the plan is complete, concierge works with all four official starter kits (Vue, React, Svelte and Livewire, including their WorkOS AuthKit variants), with or without their teams:
 
 - `concierge:install` detects the starter kit and scaffolds concierge's pages into the app, written with that kit's own components and layout ([#57](https://github.com/teylabs/concierge/issues/57)). The app owns the pages; the logic stays in the package and updates with `composer update`.
 - When the kit was generated with teams, concierge builds on the kit's own teams, memberships and invitations, and its pages extend the kit's team screens ([#20](https://github.com/teylabs/concierge/issues/20)). Without teams, invitations and roles apply to the whole app ([#19](https://github.com/teylabs/concierge/issues/19)).
@@ -25,29 +27,38 @@ php artisan concierge:install
 
 ## Milestones
 
-### 0.5: Ready for Everyone
+### 0.5: Ready for Everyone (Done)
 
-[Milestone 0.5](https://github.com/teylabs/concierge/milestone/1): a newcomer can find, understand, install and trust concierge.
+[Milestone 0.5](https://github.com/teylabs/concierge/milestone/1), closed: a newcomer can find, understand, install and trust concierge.
 
 - Local login fails closed outside the local environment, under every cache combination ([#9](https://github.com/teylabs/concierge/issues/9), done)
 - Published on Packagist ([#15](https://github.com/teylabs/concierge/issues/15), done)
 - The repository follows Tey Labs conventions: issue forms, Discussions, private vulnerability reporting ([#16](https://github.com/teylabs/concierge/issues/16), done)
-- A README rewritten for newcomers ([#10](https://github.com/teylabs/concierge/issues/10))
-- This documentation site ([#11](https://github.com/teylabs/concierge/issues/11))
-- A logo and wordmark ([#12](https://github.com/teylabs/concierge/issues/12))
-- Discoverability: llms.txt, Composer keywords, GitHub description and topics ([#14](https://github.com/teylabs/concierge/issues/14))
+- A README rewritten for newcomers ([#10](https://github.com/teylabs/concierge/issues/10), done)
+- This documentation site ([#11](https://github.com/teylabs/concierge/issues/11), done)
+- A logo and wordmark ([#12](https://github.com/teylabs/concierge/issues/12), done)
+- Discoverability: llms.txt, Composer keywords, GitHub description and topics ([#14](https://github.com/teylabs/concierge/issues/14), done)
 
-### 0.6: Built on Mod
+### 0.6: Essentials Beyond Membership (Done)
 
-[Milestone 0.6](https://github.com/teylabs/concierge/milestone/2): concierge's routes, pages and providers run through [mod](https://mod.teylabs.com).
+[Milestone 0.6](https://github.com/teylabs/concierge/milestone/8), closed: registration gating, admin-forced password reset and initials avatars, on plain action and data classes.
+
+- [Registration gating](/features/registration): open, allowed email domains, invitation only or closed ([#45](https://github.com/teylabs/concierge/issues/45), done)
+- [Admin-forced password reset](/features/forced-password-reset): the action that locks an account down and sends a reset link (part of [#47](https://github.com/teylabs/concierge/issues/47), done; the user admin screens for it come in 0.8)
+- [Initials avatars](/features/avatars) for people without a photo ([#48](https://github.com/teylabs/concierge/issues/48), done)
+- Plain action and data classes in place of laravel-actions and laravel-data ([#51](https://github.com/teylabs/concierge/issues/51), done)
+
+### 0.7: Built on Mod
+
+[Milestone 0.7](https://github.com/teylabs/concierge/milestone/2): concierge's routes, pages and providers run through [mod](https://mod.teylabs.com).
 
 - Routes, pages and providers run through mod's host API ([#17](https://github.com/teylabs/concierge/issues/17))
 - Require `tey/mod` ([#18](https://github.com/teylabs/concierge/issues/18))
-- Plain action and data classes in place of laravel-actions and laravel-data ([#51](https://github.com/teylabs/concierge/issues/51))
+- `php artisan concierge:pages` writes concierge's pages into your app for you to own and edit ([#18](https://github.com/teylabs/concierge/issues/18))
 
-### 0.7: Meets Any App Where It's At
+### 0.8: Meets Any App Where It's At
 
-[Milestone 0.7](https://github.com/teylabs/concierge/milestone/3): with or without workspaces, with or without existing sign-in, plus the user administration every app needs.
+[Milestone 0.8](https://github.com/teylabs/concierge/milestone/3): with or without workspaces, with or without existing sign-in, plus the user administration every app needs.
 
 - App-wide mode: invitations and roles without workspaces ([#19](https://github.com/teylabs/concierge/issues/19))
 - Use an app's existing team or organization model as the workspace, including a starter kit's own teams ([#20](https://github.com/teylabs/concierge/issues/20))
@@ -55,15 +66,13 @@ php artisan concierge:install
 - Sign-in for apps that have no authentication ([#23](https://github.com/teylabs/concierge/issues/23))
 - App-wide user admin: list, edit, change role, remove ([#43](https://github.com/teylabs/concierge/issues/43))
 - Deactivate and restore users across the app ([#44](https://github.com/teylabs/concierge/issues/44))
-- Registration gating: invite-only, allowed email domains, or closed ([#45](https://github.com/teylabs/concierge/issues/45))
 - Impersonation with a visible "stop impersonating" banner ([#46](https://github.com/teylabs/concierge/issues/46))
-- Admin-forced password reset that ends sessions ([#47](https://github.com/teylabs/concierge/issues/47))
-- Initials avatars for people without a photo ([#48](https://github.com/teylabs/concierge/issues/48))
+- Admin-forced password reset in the user admin, building on the 0.6 action ([#47](https://github.com/teylabs/concierge/issues/47))
 - A protected operator account, kept in sync on every deploy ([#49](https://github.com/teylabs/concierge/issues/49))
 
-### 0.8: Install and Go
+### 0.9: Install and Go
 
-[Milestone 0.8](https://github.com/teylabs/concierge/milestone/4): one setup command handles the rest, for developers and their coding agents.
+[Milestone 0.9](https://github.com/teylabs/concierge/milestone/4): one setup command handles the rest, for developers and their coding agents.
 
 - `concierge:install`: detect the app, ask only what it can't detect, set everything up ([#24](https://github.com/teylabs/concierge/issues/24))
 - Register nothing until setup has run ([#25](https://github.com/teylabs/concierge/issues/25))
@@ -74,9 +83,9 @@ php artisan concierge:install
 - Laravel Boost guidelines and skill ([#30](https://github.com/teylabs/concierge/issues/30))
 - MCP tools for setting up and operating concierge ([#31](https://github.com/teylabs/concierge/issues/31))
 
-### 0.9: Every Frontend
+### 0.10: Every Frontend
 
-[Milestone 0.9](https://github.com/teylabs/concierge/milestone/5): native pages scaffolded into each starter kit, packaged components, a standalone portal, or headless use.
+[Milestone 0.10](https://github.com/teylabs/concierge/milestone/5): native pages scaffolded into each starter kit, packaged components, a standalone portal, or headless use.
 
 - Scaffold native pages for each starter kit, with options for apps without one ([#57](https://github.com/teylabs/concierge/issues/57))
 - React starter kit pages, scaffolded with the kit's own components ([#40](https://github.com/teylabs/concierge/issues/40))

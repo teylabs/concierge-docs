@@ -127,7 +127,7 @@ $workspace = Workspace::create(['name' => 'Acme']);
 EstablishWorkspace::run($workspace, $owner);
 ```
 
-The other actions invite, resend, revoke, inspect and accept invitations, and change roles, suspend, reinstate, remove and transfer ownership. Each one's arguments, rules, results and exceptions, and the events they dispatch, are listed in [Actions and Events](/reference/actions-and-events).
+The other actions invite, resend, revoke, inspect and accept invitations, and change roles, suspend, reinstate, remove, transfer ownership and [force a password reset](/features/forced-password-reset). Each one's arguments, rules, results and exceptions, and the events they dispatch, are listed in [Actions and Events](/reference/actions-and-events).
 
 ## Protecting Routes
 
@@ -144,7 +144,7 @@ The current workspace defaults to the current Spatie permission team.
 
 ## What Your App Provides
 
-Concierge provides the domain actions, events, models and optional [Vue pages](/features/vue-pages). Your app provides:
+Concierge provides the domain actions, events, models and optional [Vue pages](/features/vue-pages), with [avatars](/features/avatars) for the people on them. Your app provides:
 
 - controllers, routes and policies that call the actions
 - authentication (login, Fortify, password setup and confirmation)

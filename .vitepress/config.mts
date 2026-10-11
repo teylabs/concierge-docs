@@ -151,8 +151,11 @@ export default defineConfig({
         items: [
           { text: 'Membership', link: '/features/membership' },
           { text: 'Tenant invitations', link: '/features/tenant-invitations' },
+          { text: 'Registration', link: '/features/registration' },
+          { text: 'Forced password reset', link: '/features/forced-password-reset' },
           { text: 'Local login', link: '/features/local-login' },
           { text: 'Vue pages', link: '/features/vue-pages' },
+          { text: 'Avatars', link: '/features/avatars' },
         ],
       },
       {
