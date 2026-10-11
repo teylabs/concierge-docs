@@ -27,7 +27,7 @@ export const ASSET_VERSION = 1
 
 // The words on the banner and share card. Placeholders until the positioning
 // line is settled: change them here and rebuild.
-export const TAGLINE = 'User management for any Laravel app'
+export const TAGLINE = 'A standard suite of essentials for every Laravel app you build.'
 export const SITE = 'concierge.teylabs.com'
 // The real install sequence, from concierge's README: the first line in orange
 // on the share card, the rest faded under it.
@@ -192,8 +192,18 @@ function bannerSvg(mode, { transparent = false } = {}) {
   const mx = 176, my = (Hh - M) / 2
   const nameSize = 250
   const tx = mx + M + 96
-  const name = wordmark(nameSize, { x: tx, y: my + 236 })
-  const tag = textPath(TEXT, TAGLINE, 68, { x: tx + 6, y: my + 344 })
+  // The tagline doesn't fit beside the mark on one line, so it wraps onto two,
+  // split at the space nearest its middle.
+  const words = TAGLINE.split(' ')
+  let cut = 1
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(' ').length, b = words.slice(i).join(' ').length
+    const ca = words.slice(0, cut).join(' ').length, cb = words.slice(cut).join(' ').length
+    if (Math.abs(a - b) < Math.abs(ca - cb)) cut = i
+  }
+  const lines = [words.slice(0, cut).join(' '), words.slice(cut).join(' ')]
+  const name = wordmark(nameSize, { x: tx, y: my + 196 })
+  const tag = { d: lines.map((l, i) => textPath(TEXT, l, 64, { x: tx + 6, y: my + 300 + i * 82 }).d).join('') }
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${Hh}" viewBox="0 0 ${W} ${Hh}">`
     + (transparent ? '' : `<rect width="${W}" height="${Hh}" fill="${bg}"/>`)
     + markPaths(M, mode, { dx: mx, dy: my })

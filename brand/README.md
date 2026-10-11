@@ -119,9 +119,9 @@ so it stays visible in print and on projectors. The name stays legible at the
 255 px thumbnail LinkedIn uses. If the install steps change, update `INSTALL`
 in `build.mjs` and rebuild.
 
-**The tagline is a placeholder** (“User management for any Laravel app”) until
-the positioning line is settled. Change `TAGLINE` in `build.mjs` and rebuild;
-it appears on the banners and the share card.
+The tagline is “A standard suite of essentials for every Laravel app you
+build.” It's `TAGLINE` in `build.mjs`: one line on the share card, wrapped onto
+two beside the mark on the banners. Change it there and rebuild.
 
 ## Deployed copies
 
