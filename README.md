@@ -7,9 +7,11 @@ The site is built with [VitePress](https://vitepress.dev). Pages live in `docs/`
 ```bash
 npm ci
 npm run dev     # http://localhost:5173
-npm run build   # checks the footer credit line and llms.txt, then builds .vitepress/dist
+npm run build   # checks the footer credit line, llms.txt and styling, then builds .vitepress/dist
 npm run preview # http://localhost:5299
 ```
+
+Styling goes through `.vitepress/theme/custom.css` and VitePress's CSS variables only; `scripts/styling.test.mjs` fails the build on any other stylesheet, `<style>` block or `style=` attribute. See [AGENTS.md](AGENTS.md).
 
 The build also publishes `/llms.txt` and the Markdown source of every page beside its HTML, for coding agents.
 
