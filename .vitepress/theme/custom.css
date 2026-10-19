@@ -85,14 +85,8 @@
   }
 }
 
-/* The credit line breaks into two lines on narrow screens, at the middle
-   dot, and the dot is hidden (Tey Labs brand guide). */
-@media (max-width: 639px) {
-  .credit-line__copy,
-  .credit-line__built {
-    display: block;
-  }
-  .credit-line__dot {
-    display: none;
-  }
+/* The credit is two lines, each wrapping as a whole (Tey Labs brand guide). */
+.credit-line__product,
+.credit-line__built {
+  display: block;
 }
