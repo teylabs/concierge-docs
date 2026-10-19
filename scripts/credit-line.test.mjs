@@ -5,7 +5,7 @@ import { creditLine } from '../.vitepress/credit.mjs'
 const text = (html) => html.replace(/<[^>]+>/g, '')
 
 test('the footer credit line keeps the brand guide words', () => {
-  assert.equal(text(creditLine), '© 2026 Concierge · Built by Tey Labs, for fellow Laravel developers.')
+  assert.equal(text(creditLine), '© 2026 Tey Labs Inc. · Built by Tey Labs.')
 })
 
 test('Tey Labs links to teylabs.com in a new tab', () => {
