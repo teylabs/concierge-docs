@@ -38,6 +38,26 @@ APP_ENV=local php artisan serve # without APP_ENV here, local login is off
 
 For php-fpm, set `env[APP_ENV] = local` in the pool. A non-local process value always wins over `$_SERVER`, and Concierge never changes the application's environment.
 
+### When the Button Doesn't Appear
+
+If the login page shows only the email and password form, check which `APP_ENV` the serving process has. Laravel's environment and the process's `APP_ENV` must both be exactly `local`.
+
+The usual cause is a configuration cache. After `php artisan config:cache` or `php artisan optimize`, Laravel reads its environment from the cache and stops loading `.env`. `php artisan about` still says `local`, but the process serving requests has no `APP_ENV`, so local login stays off. Either clear the cache locally:
+
+```bash
+php artisan config:clear
+```
+
+or give the process its own `APP_ENV`:
+
+- **`php artisan serve`**: start it as `APP_ENV=local php artisan serve`. Without a configuration cache, `serve` passes the values from `.env` to the server process, so `APP_ENV=local` in `.env` is enough.
+- **Valet**: set it for the site in a `.valet-env.php` file at the project root, which Valet passes to PHP-FPM.
+- **Herd, Valet and any php-fpm setup**: PHP-FPM reads `.env` on each request while the configuration isn't cached, so `APP_ENV=local` in `.env` is enough. With a cache, set `env[APP_ENV] = local` in the site's FPM pool, or clear the cache.
+
+An `APP_ENV` exported in your shell or set by your process manager also counts, and it wins over `.env`. `APP_ENV=development php artisan serve` turns local login off, for example.
+
+This is deliberate. A production server that cached its configuration while `APP_ENV=local` was set, or whose configuration was changed at runtime, still can't offer one-click sign-in unless the process actually serving requests says `local`.
+
 ## What It Does
 
 - It adds `POST /local-login` (route `concierge.local-login.store`), with CSRF protection, the `guest` middleware for the configured guard and a per-IP throttle (`local_login.throttle`, default 10 a minute).
