@@ -64,3 +64,7 @@ composer require tey/concierge
 ```
 
 Start with the [introduction](/guide/introduction), or see [what concierge covers](/roadmap) on the way to 1.0.
+
+## For Coding Agents
+
+Point your agent at [`/llms.txt`](/llms.txt){target="_self"}, an index of every page, or [`/llms-full.txt`](/llms-full.txt){target="_self"}, the whole documentation as one Markdown file. Each page's Markdown is also served beside it, for example [`/guide/installation.md`](/guide/installation.md){target="_self"}.

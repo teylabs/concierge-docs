@@ -6,8 +6,8 @@ This repository is the source of [concierge.teylabs.com](https://concierge.teyla
 
 Run these before opening or updating a pull request:
 
-- `npm run build`: runs `npm test` (the `scripts/*.test.mjs` suite, including the styling guard), then builds `.vitepress/dist` with `/llms.txt` and each page's Markdown source.
-- `npm run preview`, then `node scripts/verify-served.mjs` in another terminal: checks that the served `/llms.txt` and every sidebar page's Markdown match the build.
+- `npm run build`: runs `npm test` (the `scripts/*.test.mjs` suite, including the styling guard), then builds `.vitepress/dist` with `/llms.txt`, `/llms-full.txt` and each page's Markdown source. The build fails if a sidebar page is missing from `llms.txt` or `llms-full.txt`.
+- `npm run preview`, then `node scripts/verify-served.mjs` in another terminal: checks that the served `/llms.txt`, `/llms-full.txt` and every sidebar page's Markdown match the build.
 
 Look at the pages you changed in the preview, on a desktop and a phone width, in light and dark mode.
 
@@ -16,7 +16,7 @@ Look at the pages you changed in the preview, on a desktop and a phone width, in
 - The docs describe **released** behaviour of tey/concierge only. Document a feature when the release that ships it is out, and name the version where it matters. Plans belong in `docs/roadmap.md`.
 - Prose uses Canadian spelling ("behaviour", "colour"; "-ize" is fine) in the house voice: plain, short sentences, second person, no marketing.
 - Code samples must run against the documented release. Give a sample a `memo="path/to/File.php"` when it says where the code lives.
-- Every page in the sidebar ships its Markdown source beside its HTML for coding agents; don't break that (the tests in `scripts/` check it).
+- Every page in the sidebar ships its Markdown source beside its HTML, and in `/llms-full.txt`, for coding agents; don't break that (the tests in `scripts/` check it).
 
 ## Styling
 
