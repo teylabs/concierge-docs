@@ -2,12 +2,7 @@
 
 Every key in `config/concierge.php`, with its type, default and what it does, grouped by feature.
 
-Publish the file to change any of them:
-
-```bash
-php artisan vendor:publish --tag="concierge-config"
-# -> config/concierge.php
-```
+`php artisan concierge:install` writes the file; see [Installation](/guide/installation).
 
 Only the two `registration` keys read environment variables, `CONCIERGE_REGISTRATION` and `CONCIERGE_REGISTRATION_DOMAINS`. Set every other value in the file itself. Local login also checks `APP_ENV` directly; see [When It Is Available](/features/local-login#when-it-is-available).
 
@@ -15,6 +10,7 @@ Only the two `registration` keys read environment variables, `CONCIERGE_REGISTRA
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
+| `setup` | `bool` or `null` | `null` | Whether concierge is set up. `null` means set up once the app has its own `config/concierge.php`. `false` keeps concierge unregistered while the file exists. Read while the package provider registers. |
 | `mode` | `'app'`, `'workspaces'` or `null` | `null` | Where invitations and roles apply. `'app'` is the whole app, with Spatie teams off and no workspace model ([App-Wide Mode](/features/app-wide-mode)). `'workspaces'` is one workspace at a time ([Membership](/features/membership)). `null` is `'app'`, except that while `models.workspace` is set it is `'workspaces'`: that transition rule is removed at 1.0. Any other value throws `UnsupportedConfiguration` at boot. |
 | `workspaces.engine` | `'concierge'`, `'kit'` or `null` | `'concierge'` | Read in workspace mode only. `'concierge'` keeps members in concierge's own tables, with Spatie teams on. `'kit'` reads a starter kit's teams and never writes them, with Spatie teams off ([Starter Kit Teams](/features/starter-kit-teams)). `null` is `'concierge'`. |
 
