@@ -84,7 +84,9 @@ A kit's `Team` already has its own memberships and owner, so it takes `ActsAsWor
 With the kit engine, concierge binds two classes in place of its own:
 
 - `Tey\Concierge\Kit\KitMembershipSource`, bound to `Tey\Concierge\Contracts\MembershipSource`, reads a team's members through the team's `memberships()` relation, one person through the same relation, and a person's teams through the user's `teams()` relation. Each member has one role, from the pivot's `role` column. The member whose role is `owner` is the team's owner, and the pivot's `created_at` is when they joined.
-- `Tey\Concierge\Kit\KitWorkspaceContext`, bound to `WorkspaceContext`, finds the current team in the `{current_team}` route parameter (a bound model, or its route key such as a slug), and otherwise in the signed-in user's `current_team_id`. It never checks membership: the kit's own `EnsureTeamMembership` middleware does that. Protect kit team routes with that middleware, not `concierge.member`, which doesn't read kit teams yet ([#80](https://github.com/teylabs/concierge/issues/80)).
+- `Tey\Concierge\Kit\KitWorkspaceContext`, bound to `WorkspaceContext`, finds the current team in the `{current_team}` route parameter (a bound model, or its route key such as a slug), and otherwise in the signed-in user's `current_team_id`. It resolves the team without checking membership.
+
+Protect kit team routes with `concierge.member`. Under the kit engine it checks the current team's membership through `MembershipSource`, reading `team_members` rather than concierge's own memberships table. An active kit member passes, a non-member gets 403, and a request without a workspace gets 404. Membership is read fresh on every request, so removing someone through the kit takes their access away on the next request. You no longer need the kit's `EnsureTeamMembership` for this check. Concierge's own engine is unchanged.
 
 The adapter reads and never writes. Concierge's write actions refuse a kit team with a `Tey\Concierge\Exceptions\WorkspaceNotManaged` exception that names [#57](https://github.com/teylabs/concierge/issues/57). Change a kit team's members with the kit's own team screens.
 
